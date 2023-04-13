@@ -45,3 +45,22 @@ email = { desc = "read email",       project = "evergreen" }
 ```
 
 For everything else, the built-in help should do you.
+
+## Jira
+
+There's also Jira integration; it's pretty specific to my own needs, but it
+might be useful.
+
+```
+[jira]
+url = "https://jira.example.org"
+access_token = "my token"
+access_secret = "my secret"
+consumer_key = "my key"
+key_file = "/Users/michael/.ssh/my-jira.crt"
+
+[jira.projects]
+REP-1256   = 190548682  # optimization
+BF_DEFAULT = 190665570  # bfs
+DEFAULT    = 190160292  # misc
+```
