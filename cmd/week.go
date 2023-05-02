@@ -2,24 +2,22 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 	"time"
 
 	t "github.com/mmmcclimon/toggl-go/internal/toggl"
 	"github.com/spf13/cobra"
 )
 
-var weekCmd = &cobra.Command{
-	Use:   "week",
-	Short: "how's the week been?",
-	Run:   runWeek,
+type WeekCommand struct{}
+
+func (cmd WeekCommand) Cobra() *cobra.Command {
+	return &cobra.Command{
+		Use:   "week",
+		Short: "how's the week been?",
+	}
 }
 
-func init() {
-	rootCmd.AddCommand(weekCmd)
-}
-
-func runWeek(cmd *cobra.Command, args []string) {
+func (cmd WeekCommand) Run(toggl *t.Toggl, args []string) error {
 	end := time.Now()
 	start := startOfToday()
 
@@ -30,14 +28,14 @@ func runWeek(cmd *cobra.Command, args []string) {
 
 	entries, err := toggl.TimeEntries(start, end)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		return err
 	}
 
 	if len(entries) == 0 {
 		fmt.Println("Nothing logged this week.")
-		return
+		return nil
 	}
 
 	t.PrintEntryList(entries)
+	return nil
 }

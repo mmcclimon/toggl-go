@@ -2,35 +2,33 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 
 	t "github.com/mmmcclimon/toggl-go/internal/toggl"
 	"github.com/spf13/cobra"
 )
 
-func init() {
-	rootCmd.AddCommand(timerCmd)
+type TimerCommand struct{}
+
+func (cmd TimerCommand) Cobra() *cobra.Command {
+	return &cobra.Command{
+		Use:   "timer",
+		Short: "what are you doing right now?",
+	}
 }
 
-var timerCmd = &cobra.Command{
-	Use:   "timer",
-	Short: "what are you doing right now?",
-	Run:   runTimer,
-}
-
-func runTimer(cmd *cobra.Command, args []string) {
+func (cmd TimerCommand) Run(toggl *t.Toggl, args []string) error {
 	timer, err := toggl.CurrentTimer()
 
 	if err != nil {
 		switch err {
 		case t.ErrNoTimer:
 			fmt.Println("You don't have a running timer!")
-			return
+			return nil
 		default:
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
+			return err
 		}
 	}
 
 	fmt.Printf("%s so far: %s\n", timer.Duration(), timer.OnelineDesc())
+	return nil
 }

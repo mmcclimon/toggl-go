@@ -3,55 +3,53 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"os"
 	"regexp"
 	"strings"
 
+	t "github.com/mmmcclimon/toggl-go/internal/toggl"
 	"github.com/spf13/cobra"
 )
 
-var startCmd = &cobra.Command{
-	Use:   "start description",
-	Short: "start doing a new thing",
-	RunE:  runStart,
-}
-
-var opts struct {
+type StartCommand struct {
 	project string
 	id      string
 }
 
-func init() {
-	startCmd.Flags().StringVarP(&opts.project, "project", "p", "", "project shortcut for this task")
-
-	if JIRA_ENABLED {
-		startCmd.Flags().StringVarP(&opts.id, "id", "i", "", "jira id for this task")
+func (cmd StartCommand) Cobra() *cobra.Command {
+	cc := &cobra.Command{
+		Use:   "start description",
+		Short: "start doing a new thing",
 	}
 
-	rootCmd.AddCommand(startCmd)
+	cc.Flags().StringVarP(&cmd.project, "project", "p", "", "project shortcut for this task")
+
+	if JIRA_ENABLED {
+		cc.Flags().StringVarP(&cmd.id, "id", "i", "", "jira id for this task")
+	}
+
+	return cc
 }
 
-var likelyId = regexp.MustCompile(`(?i)^[a-z]{3,}-[0-9]+$`)
-
-func runStart(cmd *cobra.Command, args []string) error {
+func (cmd StartCommand) Run(toggl *t.Toggl, args []string) error {
 	desc := strings.Join(args, " ")
 	if len(desc) == 0 {
 		return errors.New("need a description")
 	}
 
-	if JIRA_ENABLED && (opts.id != "" || likelyId.MatchString(desc)) {
-		id := opts.id
+	likelyId := regexp.MustCompile(`(?i)^[a-z]{3,}-[0-9]+$`)
+
+	if JIRA_ENABLED && (cmd.id != "" || likelyId.MatchString(desc)) {
+		id := cmd.id
 		if id == "" {
 			id = desc
 		}
 
-		startJiraTask(id)
-		return nil
+		return startJiraTask(toggl, id)
 	}
 
 	projectId := 0
-	if len(opts.project) > 0 {
-		projectId = toggl.Config.ProjectShortcuts[opts.project]
+	if len(cmd.project) > 0 {
+		projectId = toggl.Config.ProjectShortcuts[cmd.project]
 	}
 
 	// is this a shortcut
@@ -60,10 +58,8 @@ func runStart(cmd *cobra.Command, args []string) error {
 		sc := fields[0]
 
 		shortcut, ok := toggl.Config.TaskShortcuts[strings.TrimPrefix(sc, "@")]
-
 		if !ok {
-			fmt.Printf("could not resolve shortcut %s\n", sc)
-			os.Exit(1)
+			return fmt.Errorf("could not resolve shortcut %s", sc)
 		}
 
 		// no error handling here, just don't mess up your config file, ok
@@ -88,17 +84,15 @@ func runStart(cmd *cobra.Command, args []string) error {
 		desc = strings.Join(words[0:len(words)-1], " ")
 	}
 
-	startTask(desc, projectId, tag)
-	return nil
+	return startTask(toggl, desc, projectId, tag)
 }
 
-func startTask(desc string, projectId int, tag string) {
+func startTask(toggl *t.Toggl, desc string, projectId int, tag string) error {
 	timer, err := toggl.StartTimer(desc, projectId, tag)
-
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		return err
 	}
 
 	fmt.Printf("started timer: %s\n", timer.OnelineDesc())
+	return nil
 }

@@ -10,27 +10,24 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var loggedLongHelp = "Search time entries for the last n days and find " +
-	"descriptions matching DESC."
-
-var loggedOpts struct {
+type LoggedCommand struct {
 	days int
 }
 
-var loggedCmd = &cobra.Command{
-	Use:   "logged DESC",
-	Short: "how much time did you spend on that thing?",
-	Long:  loggedLongHelp,
-	Run:   runLogged,
+func (cmd LoggedCommand) Cobra() *cobra.Command {
+	long := "Search time entries for the last n days and find descriptions matching DESC."
+
+	cc := &cobra.Command{
+		Use:   "logged DESC",
+		Short: "how much time did you spend on that thing?",
+		Long:  long,
+	}
+
+	cc.Flags().IntVarP(&cmd.days, "days", "d", 30, "how many days to look back")
+	return cc
 }
 
-func init() {
-	loggedCmd.Flags().IntVarP(&loggedOpts.days, "days", "d", 30, "how many days to look back")
-
-	rootCmd.AddCommand(loggedCmd)
-}
-
-func runLogged(cmd *cobra.Command, args []string) {
+func (cmd LoggedCommand) Run(toggl *t.Toggl, args []string) error {
 	if len(args) != 1 {
 		fmt.Println("need exactly one description to search for")
 		os.Exit(1)
@@ -43,7 +40,7 @@ func runLogged(cmd *cobra.Command, args []string) {
 	}
 
 	end := time.Now()
-	start := end.Add(-1 * time.Duration(loggedOpts.days) * 24 * time.Hour)
+	start := end.Add(-1 * time.Duration(cmd.days) * 24 * time.Hour)
 
 	entries, err := toggl.TimeEntries(start, end)
 	if err != nil {
@@ -61,8 +58,9 @@ func runLogged(cmd *cobra.Command, args []string) {
 
 	if len(matching) == 0 {
 		fmt.Println("Nothing logged matching that description.")
-		return
+		return nil
 	}
 
 	t.PrintEntryList(matching)
+	return nil
 }

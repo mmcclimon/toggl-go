@@ -4,21 +4,21 @@ import (
 	"fmt"
 	"sort"
 
+	t "github.com/mmmcclimon/toggl-go/internal/toggl"
 	"github.com/spf13/cobra"
 	"golang.org/x/exp/maps"
 )
 
-var shortcutsCmd = &cobra.Command{
-	Use:   "shortcuts",
-	Short: "list the things you can start easily",
-	Run:   runShortcuts,
+type ShortcutsCommand struct{}
+
+func (cmd ShortcutsCommand) Cobra() *cobra.Command {
+	return &cobra.Command{
+		Use:   "shortcuts",
+		Short: "list the things you can start easily",
+	}
 }
 
-func init() {
-	rootCmd.AddCommand(shortcutsCmd)
-}
-
-func runShortcuts(cmd *cobra.Command, args []string) {
+func (cmd ShortcutsCommand) Run(toggl *t.Toggl, args []string) error {
 	shortcuts := toggl.Config.TaskShortcuts
 
 	titles := maps.Keys(shortcuts)
@@ -44,4 +44,6 @@ func runShortcuts(cmd *cobra.Command, args []string) {
 
 		fmt.Printf("@%-*s %s (%s)\n", length+2, title, desc, project)
 	}
+
+	return nil
 }

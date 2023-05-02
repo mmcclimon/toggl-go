@@ -1,44 +1,71 @@
 package cmd
 
 import (
-	"fmt"
-	"os"
 	"time"
 
 	t "github.com/mmmcclimon/toggl-go/internal/toggl"
 	"github.com/spf13/cobra"
 )
 
-var toggl *t.Toggl
-
-var rootCmd = &cobra.Command{
-	Use: "toggl",
-
-	// read config, etc.
-	PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
-		if !cmd.HasParent() {
-			// we're the root, only exist for help
-			return nil
-		}
-
-		toggl = t.NewToggl()
-		return toggl.ReadConfig()
-	},
-
-	// do not generate a "completion" command, jeez
-	CompletionOptions: cobra.CompletionOptions{DisableDefaultCmd: true},
+type TogglCommand interface {
+	Run(toggl *t.Toggl, args []string) error
+	Cobra() *cobra.Command
 }
 
 func Execute() {
-	// hide all the root help, it's just in the way
-	rootCmd.InitDefaultHelpFlag()
-	_ = rootCmd.Flags().MarkHidden("help") // will not fail; we know --help exists
-	rootCmd.SetHelpCommand(&cobra.Command{Hidden: true})
+	cmd := setup()
+	_ = cmd.Execute()
+}
 
-	if err := rootCmd.Execute(); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+var allCommands = []TogglCommand{
+	AbortCommand{},
+	ConfigCommand{},
+	LoggedCommand{},
+	ProjectsCommand{},
+	ResumeCommand{},
+	ShortcutsCommand{},
+	StartCommand{},
+	StopCommand{},
+	TimerCommand{},
+	TodayCommand{},
+	WeekCommand{},
+}
+
+func setup() *cobra.Command {
+	var toggl *t.Toggl
+
+	rootCmd := &cobra.Command{
+		Use:               "toggl",
+		CompletionOptions: cobra.CompletionOptions{DisableDefaultCmd: true},
+		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
+			return maybeLoadConfig(cmd, &toggl)
+		},
 	}
+
+	// hide all the root help, it's just in the way
+	rootCmd.SetHelpCommand(&cobra.Command{Hidden: true})
+	rootCmd.InitDefaultHelpFlag()
+	_ = rootCmd.Flags().MarkHidden("help")
+
+	for _, cmd := range allCommands {
+		cmd := cmd
+		cc := cmd.Cobra()
+		cc.RunE = func(_ *cobra.Command, args []string) error { return cmd.Run(toggl, args) }
+		rootCmd.AddCommand(cc)
+	}
+
+	return rootCmd
+}
+
+// If cmd is a child command (i.e., not the root), load up the config.
+func maybeLoadConfig(cmd *cobra.Command, toggl **t.Toggl) error {
+	if !cmd.HasParent() {
+		return nil
+	}
+
+	// read config, etc.
+	*toggl = t.NewToggl()
+	return (*toggl).ReadConfig()
 }
 
 // This is so goofy: time.Truncate() acts on absolute (roughly, Unix) time,

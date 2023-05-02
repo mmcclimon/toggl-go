@@ -2,37 +2,35 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 	"time"
 
 	t "github.com/mmmcclimon/toggl-go/internal/toggl"
 	"github.com/spf13/cobra"
 )
 
-var todayCmd = &cobra.Command{
-	Use:   "today",
-	Short: "what are the things you've done today?",
-	Run:   runToday,
+type TodayCommand struct{}
+
+func (cmd TodayCommand) Cobra() *cobra.Command {
+	return &cobra.Command{
+		Use:   "today",
+		Short: "what are the things you've done today?",
+	}
 }
 
-func init() {
-	rootCmd.AddCommand(todayCmd)
-}
-
-func runToday(cmd *cobra.Command, args []string) {
+func (cmd TodayCommand) Run(toggl *t.Toggl, args []string) error {
 	start := startOfToday()
 	end := time.Now()
 
 	entries, err := toggl.TimeEntries(start, end)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		return err
 	}
 
 	if len(entries) == 0 {
 		fmt.Println("Nothing logged today.")
-		return
+		return nil
 	}
 
 	t.PrintEntryList(entries)
+	return nil
 }
