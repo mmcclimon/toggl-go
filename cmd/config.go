@@ -8,7 +8,7 @@ import (
 
 type ConfigCommand struct{}
 
-func (cmd ConfigCommand) Cobra() *cobra.Command {
+func (cmd *ConfigCommand) Cobra() *cobra.Command {
 	return &cobra.Command{
 		Use:    "config",
 		Short:  "dump config and exit (for debugging)",
@@ -16,7 +16,7 @@ func (cmd ConfigCommand) Cobra() *cobra.Command {
 	}
 }
 
-func (cmd ConfigCommand) Run(tc *toggl.Client, args []string) error {
+func (cmd *ConfigCommand) Run(tc *toggl.Client, args []string) error {
 	cfg := tc.Config
 	spew.Dump(cfg)
 	return nil

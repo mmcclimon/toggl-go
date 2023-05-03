@@ -10,14 +10,14 @@ import (
 
 type WeekCommand struct{}
 
-func (cmd WeekCommand) Cobra() *cobra.Command {
+func (cmd *WeekCommand) Cobra() *cobra.Command {
 	return &cobra.Command{
 		Use:   "week",
 		Short: "how's the week been?",
 	}
 }
 
-func (cmd WeekCommand) Run(tc *toggl.Client, args []string) error {
+func (cmd *WeekCommand) Run(tc *toggl.Client, args []string) error {
 	end := time.Now()
 	start := startOfToday()
 

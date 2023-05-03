@@ -10,14 +10,14 @@ import (
 
 type ResumeCommand struct{}
 
-func (cmd ResumeCommand) Cobra() *cobra.Command {
+func (cmd *ResumeCommand) Cobra() *cobra.Command {
 	return &cobra.Command{
 		Use:   "resume",
 		Short: "restart the last thing you were doing",
 	}
 }
 
-func (cmd ResumeCommand) Run(tc *toggl.Client, args []string) error {
+func (cmd *ResumeCommand) Run(tc *toggl.Client, args []string) error {
 	start := time.Now().Add(-6 * time.Hour)
 	end := time.Now()
 

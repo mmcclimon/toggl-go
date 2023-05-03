@@ -10,14 +10,14 @@ import (
 
 type TodayCommand struct{}
 
-func (cmd TodayCommand) Cobra() *cobra.Command {
+func (cmd *TodayCommand) Cobra() *cobra.Command {
 	return &cobra.Command{
 		Use:   "today",
 		Short: "what are the things you've done today?",
 	}
 }
 
-func (cmd TodayCommand) Run(tc *toggl.Client, args []string) error {
+func (cmd *TodayCommand) Run(tc *toggl.Client, args []string) error {
 	start := startOfToday()
 	end := time.Now()
 

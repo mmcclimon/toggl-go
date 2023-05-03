@@ -9,14 +9,14 @@ import (
 
 type AbortCommand struct{}
 
-func (cmd AbortCommand) Cobra() *cobra.Command {
+func (cmd *AbortCommand) Cobra() *cobra.Command {
 	return &cobra.Command{
 		Use:   "abort",
 		Short: "actually, you weren't doing that thing after all",
 	}
 }
 
-func (cmd AbortCommand) Run(tc *toggl.Client, args []string) error {
+func (cmd *AbortCommand) Run(tc *toggl.Client, args []string) error {
 	timer, err := tc.AbortCurrentTimer()
 
 	if err != nil {

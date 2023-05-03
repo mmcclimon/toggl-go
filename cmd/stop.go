@@ -9,14 +9,14 @@ import (
 
 type StopCommand struct{}
 
-func (cmd StopCommand) Cobra() *cobra.Command {
+func (cmd *StopCommand) Cobra() *cobra.Command {
 	return &cobra.Command{
 		Use:   "stop",
 		Short: "stop doing the thing you're doing",
 	}
 }
 
-func (cmd StopCommand) Run(tc *toggl.Client, args []string) error {
+func (cmd *StopCommand) Run(tc *toggl.Client, args []string) error {
 	timer, err := tc.StopCurrentTimer()
 
 	if err != nil {

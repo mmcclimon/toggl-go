@@ -13,7 +13,7 @@ type LoggedCommand struct {
 	days int
 }
 
-func (cmd LoggedCommand) Cobra() *cobra.Command {
+func (cmd *LoggedCommand) Cobra() *cobra.Command {
 	long := "Search time entries for the last n days and find descriptions matching DESC."
 
 	cc := &cobra.Command{
@@ -26,7 +26,7 @@ func (cmd LoggedCommand) Cobra() *cobra.Command {
 	return cc
 }
 
-func (cmd LoggedCommand) Run(tc *toggl.Client, args []string) error {
+func (cmd *LoggedCommand) Run(tc *toggl.Client, args []string) error {
 	if len(args) != 1 {
 		return fmt.Errorf("need exactly one description to search for")
 	}

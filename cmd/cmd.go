@@ -18,17 +18,17 @@ func Execute() {
 }
 
 var allCommands = []TogglCommand{
-	AbortCommand{},
-	ConfigCommand{},
-	LoggedCommand{},
-	ProjectsCommand{},
-	ResumeCommand{},
-	ShortcutsCommand{},
-	StartCommand{},
-	StopCommand{},
-	TimerCommand{},
-	TodayCommand{},
-	WeekCommand{},
+	&AbortCommand{},
+	&ConfigCommand{},
+	&LoggedCommand{},
+	&ProjectsCommand{},
+	&ResumeCommand{},
+	&ShortcutsCommand{},
+	&StartCommand{},
+	&StopCommand{},
+	&TimerCommand{},
+	&TodayCommand{},
+	&WeekCommand{},
 }
 
 func setup() *cobra.Command {

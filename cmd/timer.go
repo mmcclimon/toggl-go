@@ -9,14 +9,14 @@ import (
 
 type TimerCommand struct{}
 
-func (cmd TimerCommand) Cobra() *cobra.Command {
+func (cmd *TimerCommand) Cobra() *cobra.Command {
 	return &cobra.Command{
 		Use:   "timer",
 		Short: "what are you doing right now?",
 	}
 }
 
-func (cmd TimerCommand) Run(tc *toggl.Client, args []string) error {
+func (cmd *TimerCommand) Run(tc *toggl.Client, args []string) error {
 	timer, err := tc.CurrentTimer()
 
 	if err != nil {

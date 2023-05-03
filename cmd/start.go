@@ -15,7 +15,7 @@ type StartCommand struct {
 	id      string
 }
 
-func (cmd StartCommand) Cobra() *cobra.Command {
+func (cmd *StartCommand) Cobra() *cobra.Command {
 	cc := &cobra.Command{
 		Use:   "start description",
 		Short: "start doing a new thing",
@@ -30,7 +30,7 @@ func (cmd StartCommand) Cobra() *cobra.Command {
 	return cc
 }
 
-func (cmd StartCommand) Run(tc *toggl.Client, args []string) error {
+func (cmd *StartCommand) Run(tc *toggl.Client, args []string) error {
 	desc := strings.Join(args, " ")
 	if len(desc) == 0 {
 		return errors.New("need a description")

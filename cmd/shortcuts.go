@@ -11,14 +11,14 @@ import (
 
 type ShortcutsCommand struct{}
 
-func (cmd ShortcutsCommand) Cobra() *cobra.Command {
+func (cmd *ShortcutsCommand) Cobra() *cobra.Command {
 	return &cobra.Command{
 		Use:   "shortcuts",
 		Short: "list the things you can start easily",
 	}
 }
 
-func (cmd ShortcutsCommand) Run(tc *toggl.Client, args []string) error {
+func (cmd *ShortcutsCommand) Run(tc *toggl.Client, args []string) error {
 	shortcuts := tc.Config.TaskShortcuts
 
 	titles := maps.Keys(shortcuts)
