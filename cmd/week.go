@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	t "github.com/mmmcclimon/toggl-go/internal/toggl"
+	"github.com/mmmcclimon/toggl-go/internal/toggl"
 	"github.com/spf13/cobra"
 )
 
@@ -17,7 +17,7 @@ func (cmd WeekCommand) Cobra() *cobra.Command {
 	}
 }
 
-func (cmd WeekCommand) Run(toggl *t.Toggl, args []string) error {
+func (cmd WeekCommand) Run(tc *toggl.Client, args []string) error {
 	end := time.Now()
 	start := startOfToday()
 
@@ -26,7 +26,7 @@ func (cmd WeekCommand) Run(toggl *t.Toggl, args []string) error {
 		start = start.Add(-24 * time.Hour)
 	}
 
-	entries, err := toggl.TimeEntries(start, end)
+	entries, err := tc.TimeEntries(start, end)
 	if err != nil {
 		return err
 	}
@@ -36,6 +36,6 @@ func (cmd WeekCommand) Run(toggl *t.Toggl, args []string) error {
 		return nil
 	}
 
-	t.PrintEntryList(entries)
+	toggl.PrintEntryList(entries)
 	return nil
 }

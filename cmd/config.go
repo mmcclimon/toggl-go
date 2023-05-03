@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"github.com/davecgh/go-spew/spew"
-	t "github.com/mmmcclimon/toggl-go/internal/toggl"
+	"github.com/mmmcclimon/toggl-go/internal/toggl"
 	"github.com/spf13/cobra"
 )
 
@@ -16,8 +16,8 @@ func (cmd ConfigCommand) Cobra() *cobra.Command {
 	}
 }
 
-func (cmd ConfigCommand) Run(toggl *t.Toggl, args []string) error {
-	cfg := toggl.Config
+func (cmd ConfigCommand) Run(tc *toggl.Client, args []string) error {
+	cfg := tc.Config
 	spew.Dump(cfg)
 	return nil
 }

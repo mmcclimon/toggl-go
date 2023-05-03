@@ -20,7 +20,7 @@ type Config struct {
 
 // ReadConfig reads the toggl config file, and returns an error if it can't
 // figure out what to read, or if it's not toml
-func (t *Toggl) ReadConfig() error {
+func (c *Client) ReadConfig() error {
 	filename := os.Getenv("TOGGL_CONFIG_FILE")
 
 	if filename == "" {
@@ -37,17 +37,17 @@ func (t *Toggl) ReadConfig() error {
 		return fmt.Errorf("could not read config file: %w", err)
 	}
 
-	_, err = toml.Decode(string(tomlData), &t.Config)
+	_, err = toml.Decode(string(tomlData), &c.Config)
 	if err != nil {
 		return fmt.Errorf("bad config file: %w", err)
 	}
 
 	byId := make(map[int]string)
-	for name, id := range t.Config.ProjectShortcuts {
+	for name, id := range c.Config.ProjectShortcuts {
 		byId[id] = name
 	}
 
-	t.Config.projectsById = byId
+	c.Config.projectsById = byId
 
 	return nil
 }

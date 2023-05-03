@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"strings"
 
-	t "github.com/mmmcclimon/toggl-go/internal/toggl"
+	"github.com/mmmcclimon/toggl-go/internal/toggl"
 	"github.com/spf13/cobra"
 )
 
@@ -30,7 +30,7 @@ func (cmd StartCommand) Cobra() *cobra.Command {
 	return cc
 }
 
-func (cmd StartCommand) Run(toggl *t.Toggl, args []string) error {
+func (cmd StartCommand) Run(tc *toggl.Client, args []string) error {
 	desc := strings.Join(args, " ")
 	if len(desc) == 0 {
 		return errors.New("need a description")
@@ -44,12 +44,12 @@ func (cmd StartCommand) Run(toggl *t.Toggl, args []string) error {
 			id = desc
 		}
 
-		return startJiraTask(toggl, id)
+		return startJiraTask(tc, id)
 	}
 
 	projectId := 0
 	if len(cmd.project) > 0 {
-		projectId = toggl.Config.ProjectShortcuts[cmd.project]
+		projectId = tc.Config.ProjectShortcuts[cmd.project]
 	}
 
 	// is this a shortcut
@@ -57,7 +57,7 @@ func (cmd StartCommand) Run(toggl *t.Toggl, args []string) error {
 		fields := strings.Fields(desc)
 		sc := fields[0]
 
-		shortcut, ok := toggl.Config.TaskShortcuts[strings.TrimPrefix(sc, "@")]
+		shortcut, ok := tc.Config.TaskShortcuts[strings.TrimPrefix(sc, "@")]
 		if !ok {
 			return fmt.Errorf("could not resolve shortcut %s", sc)
 		}
@@ -65,7 +65,7 @@ func (cmd StartCommand) Run(toggl *t.Toggl, args []string) error {
 		// no error handling here, just don't mess up your config file, ok
 		desc = shortcut["desc"]
 		if proj, ok := shortcut["project"]; ok {
-			projectId = toggl.Config.ProjectShortcuts[proj]
+			projectId = tc.Config.ProjectShortcuts[proj]
 		}
 
 		// add back on the tag, if there is one
@@ -84,11 +84,11 @@ func (cmd StartCommand) Run(toggl *t.Toggl, args []string) error {
 		desc = strings.Join(words[0:len(words)-1], " ")
 	}
 
-	return startTask(toggl, desc, projectId, tag)
+	return startTask(tc, desc, projectId, tag)
 }
 
-func startTask(toggl *t.Toggl, desc string, projectId int, tag string) error {
-	timer, err := toggl.StartTimer(desc, projectId, tag)
+func startTask(tc *toggl.Client, desc string, projectId int, tag string) error {
+	timer, err := tc.StartTimer(desc, projectId, tag)
 	if err != nil {
 		return err
 	}

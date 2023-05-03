@@ -32,8 +32,8 @@ type timerData struct {
 	Tags        []string
 }
 
-func (t *Toggl) timerFromData(data timerData) *Timer {
-	project, ok := t.Config.projectsById[data.ProjectId]
+func (c *Client) timerFromData(data timerData) *Timer {
+	project, ok := c.Config.projectsById[data.ProjectId]
 	if !ok {
 		project = "--"
 	}
@@ -51,7 +51,7 @@ func (t *Toggl) timerFromData(data timerData) *Timer {
 	}
 }
 
-func (t *Toggl) timerFromResponseBody(body io.Reader) (*Timer, error) {
+func (c *Client) timerFromResponseBody(body io.Reader) (*Timer, error) {
 	var data timerData
 	decoder := json.NewDecoder(body)
 
@@ -63,10 +63,10 @@ func (t *Toggl) timerFromResponseBody(body io.Reader) (*Timer, error) {
 		return nil, ErrNoTimer
 	}
 
-	return t.timerFromData(data), nil
+	return c.timerFromData(data), nil
 }
 
-func (t *Toggl) timersFromResponseBody(body io.Reader) ([]*Timer, error) {
+func (c *Client) timersFromResponseBody(body io.Reader) ([]*Timer, error) {
 	var data []timerData
 	decoder := json.NewDecoder(body)
 
@@ -76,7 +76,7 @@ func (t *Toggl) timersFromResponseBody(body io.Reader) ([]*Timer, error) {
 
 	ret := make([]*Timer, 0, len(data))
 	for _, td := range data {
-		ret = append(ret, t.timerFromData(td))
+		ret = append(ret, c.timerFromData(td))
 	}
 
 	return ret, nil

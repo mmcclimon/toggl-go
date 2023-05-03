@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	t "github.com/mmmcclimon/toggl-go/internal/toggl"
+	"github.com/mmmcclimon/toggl-go/internal/toggl"
 	"github.com/spf13/cobra"
 )
 
@@ -17,11 +17,11 @@ func (cmd TodayCommand) Cobra() *cobra.Command {
 	}
 }
 
-func (cmd TodayCommand) Run(toggl *t.Toggl, args []string) error {
+func (cmd TodayCommand) Run(tc *toggl.Client, args []string) error {
 	start := startOfToday()
 	end := time.Now()
 
-	entries, err := toggl.TimeEntries(start, end)
+	entries, err := tc.TimeEntries(start, end)
 	if err != nil {
 		return err
 	}
@@ -31,6 +31,6 @@ func (cmd TodayCommand) Run(toggl *t.Toggl, args []string) error {
 		return nil
 	}
 
-	t.PrintEntryList(entries)
+	toggl.PrintEntryList(entries)
 	return nil
 }

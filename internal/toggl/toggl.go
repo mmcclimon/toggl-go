@@ -14,13 +14,13 @@ import (
 	"golang.org/x/exp/maps"
 )
 
-type Toggl struct {
+type Client struct {
 	Config Config
 	client http.Client
 }
 
-func NewToggl() *Toggl {
-	return &Toggl{
+func NewClient() *Client {
+	return &Client{
 		Config: Config{},
 		client: http.Client{},
 	}
@@ -52,8 +52,8 @@ type startArgs struct {
 	Tags        []string `json:"tags,omitempty"`
 }
 
-func (t *Toggl) StartTimer(description string, projectId int, tag string) (*Timer, error) {
-	url := urlFor("/workspaces/%d/time_entries", t.Config.WorkspaceId)
+func (c *Client) StartTimer(description string, projectId int, tag string) (*Timer, error) {
+	url := urlFor("/workspaces/%d/time_entries", c.Config.WorkspaceId)
 
 	now := time.Now()
 
@@ -67,7 +67,7 @@ func (t *Toggl) StartTimer(description string, projectId int, tag string) (*Time
 		CreatedWith: UserAgent,
 		Start:       now.UTC().Format(time.RFC3339),
 		Duration:    now.Unix() * -1,
-		WorkspaceId: t.Config.WorkspaceId,
+		WorkspaceId: c.Config.WorkspaceId,
 		ProjectId:   projectId,
 		Tags:        tags,
 	}
@@ -82,37 +82,37 @@ func (t *Toggl) StartTimer(description string, projectId int, tag string) (*Time
 		panic(err)
 	}
 
-	res, err := t.doRequest(req)
+	res, err := c.doRequest(req)
 	if err != nil {
 		return nil, fmt.Errorf("bad post: %w", err)
 	}
 
 	defer res.Body.Close()
-	return t.timerFromResponseBody(res.Body)
+	return c.timerFromResponseBody(res.Body)
 }
 
-func (t *Toggl) ResumeTimer(timer *Timer) (*Timer, error) {
+func (c *Client) ResumeTimer(timer *Timer) (*Timer, error) {
 	tag := ""
 	if len(timer.Tags) > 0 {
 		tag = timer.Tags[0]
 	}
 
-	return t.StartTimer(timer.Description, timer.projectId, tag)
+	return c.StartTimer(timer.Description, timer.projectId, tag)
 }
 
-func (t *Toggl) CurrentTimer() (*Timer, error) {
-	res, err := t.get(urlFor("/me/time_entries/current"))
+func (c *Client) CurrentTimer() (*Timer, error) {
+	res, err := c.get(urlFor("/me/time_entries/current"))
 
 	if err != nil {
 		return nil, err
 	}
 
 	defer res.Body.Close()
-	return t.timerFromResponseBody(res.Body)
+	return c.timerFromResponseBody(res.Body)
 }
 
-func (t *Toggl) StopCurrentTimer() (*Timer, error) {
-	timer, err := t.CurrentTimer()
+func (c *Client) StopCurrentTimer() (*Timer, error) {
+	timer, err := c.CurrentTimer()
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +124,7 @@ func (t *Toggl) StopCurrentTimer() (*Timer, error) {
 		panic(err) // should not happen
 	}
 
-	res, err := t.doRequest(req)
+	res, err := c.doRequest(req)
 	if err != nil {
 		return nil, fmt.Errorf("bad patch: %w", err)
 	}
@@ -136,11 +136,11 @@ func (t *Toggl) StopCurrentTimer() (*Timer, error) {
 		dumpResponseAndExit(res)
 	}
 
-	return t.timerFromResponseBody(res.Body)
+	return c.timerFromResponseBody(res.Body)
 }
 
-func (t *Toggl) AbortCurrentTimer() (*Timer, error) {
-	timer, err := t.CurrentTimer()
+func (c *Client) AbortCurrentTimer() (*Timer, error) {
+	timer, err := c.CurrentTimer()
 	if err != nil {
 		return nil, err
 	}
@@ -152,7 +152,7 @@ func (t *Toggl) AbortCurrentTimer() (*Timer, error) {
 		panic(err) // should not happen
 	}
 
-	res, err := t.doRequest(req)
+	res, err := c.doRequest(req)
 
 	if err != nil {
 		return nil, fmt.Errorf("bad abort: %w", err)
@@ -166,7 +166,7 @@ func (t *Toggl) AbortCurrentTimer() (*Timer, error) {
 	return timer, nil
 }
 
-func (t *Toggl) TimeEntries(start, end time.Time) ([]*Timer, error) {
+func (c *Client) TimeEntries(start, end time.Time) ([]*Timer, error) {
 	loc := urlFor("/me/time_entries")
 
 	params := url.Values{}
@@ -174,14 +174,14 @@ func (t *Toggl) TimeEntries(start, end time.Time) ([]*Timer, error) {
 	params.Add("end_date", end.UTC().Format(time.RFC3339))
 	loc.RawQuery = params.Encode()
 
-	res, err := t.get(loc)
+	res, err := c.get(loc)
 
 	if err != nil {
 		return nil, err
 	}
 
 	defer res.Body.Close()
-	return t.timersFromResponseBody(res.Body)
+	return c.timersFromResponseBody(res.Body)
 }
 
 func PrintEntryList(entries []*Timer) {

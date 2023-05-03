@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 
-	t "github.com/mmmcclimon/toggl-go/internal/toggl"
+	"github.com/mmmcclimon/toggl-go/internal/toggl"
 	"github.com/spf13/cobra"
 )
 
@@ -16,12 +16,12 @@ func (cmd StopCommand) Cobra() *cobra.Command {
 	}
 }
 
-func (cmd StopCommand) Run(toggl *t.Toggl, args []string) error {
-	timer, err := toggl.StopCurrentTimer()
+func (cmd StopCommand) Run(tc *toggl.Client, args []string) error {
+	timer, err := tc.StopCurrentTimer()
 
 	if err != nil {
 		switch err {
-		case t.ErrNoTimer:
+		case toggl.ErrNoTimer:
 			fmt.Println("You don't have a running timer!")
 			return nil
 		default:

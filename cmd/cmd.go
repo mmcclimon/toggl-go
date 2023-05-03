@@ -3,12 +3,12 @@ package cmd
 import (
 	"time"
 
-	t "github.com/mmmcclimon/toggl-go/internal/toggl"
+	"github.com/mmmcclimon/toggl-go/internal/toggl"
 	"github.com/spf13/cobra"
 )
 
 type TogglCommand interface {
-	Run(toggl *t.Toggl, args []string) error
+	Run(toggl *toggl.Client, args []string) error
 	Cobra() *cobra.Command
 }
 
@@ -32,7 +32,7 @@ var allCommands = []TogglCommand{
 }
 
 func setup() *cobra.Command {
-	var toggl *t.Toggl
+	var toggl *toggl.Client
 
 	rootCmd := &cobra.Command{
 		Use:               "toggl",
@@ -58,14 +58,14 @@ func setup() *cobra.Command {
 }
 
 // If cmd is a child command (i.e., not the root), load up the config.
-func maybeLoadConfig(cmd *cobra.Command, toggl **t.Toggl) error {
+func maybeLoadConfig(cmd *cobra.Command, client **toggl.Client) error {
 	if !cmd.HasParent() {
 		return nil
 	}
 
 	// read config, etc.
-	*toggl = t.NewToggl()
-	return (*toggl).ReadConfig()
+	*client = toggl.NewClient()
+	return (*client).ReadConfig()
 }
 
 // This is so goofy: time.Truncate() acts on absolute (roughly, Unix) time,

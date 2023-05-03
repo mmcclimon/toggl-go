@@ -6,16 +6,16 @@ import (
 	"os"
 )
 
-func (t *Toggl) doRequest(req *http.Request) (*http.Response, error) {
+func (c *Client) doRequest(req *http.Request) (*http.Response, error) {
 	// default headers
 	req.Header.Add("Accept", "application/json")
-	req.SetBasicAuth(t.Config.ApiToken, "api_token")
+	req.SetBasicAuth(c.Config.ApiToken, "api_token")
 
 	if req.Body != nil {
 		req.Header.Add("Content-Type", "application/json")
 	}
 
-	res, err := t.client.Do(req)
+	res, err := c.client.Do(req)
 
 	if err != nil {
 		return nil, err
@@ -27,13 +27,13 @@ func (t *Toggl) doRequest(req *http.Request) (*http.Response, error) {
 	return res, nil
 }
 
-func (t *Toggl) get(loc *url.URL) (*http.Response, error) {
+func (c *Client) get(loc *url.URL) (*http.Response, error) {
 	req, err := http.NewRequest(http.MethodGet, loc.String(), nil)
 	if err != nil {
 		panic(err) // should not happen
 	}
 
-	return t.doRequest(req)
+	return c.doRequest(req)
 }
 
 func dumpResponseAndExit(res *http.Response) {

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sort"
 
-	t "github.com/mmmcclimon/toggl-go/internal/toggl"
+	"github.com/mmmcclimon/toggl-go/internal/toggl"
 	"github.com/spf13/cobra"
 	"golang.org/x/exp/maps"
 )
@@ -18,8 +18,8 @@ func (cmd ProjectsCommand) Cobra() *cobra.Command {
 	}
 }
 
-func (cmd ProjectsCommand) Run(toggl *t.Toggl, args []string) error {
-	projects := toggl.Config.ProjectShortcuts
+func (cmd ProjectsCommand) Run(tc *toggl.Client, args []string) error {
+	projects := tc.Config.ProjectShortcuts
 
 	shortcuts := maps.Keys(projects)
 	sort.Strings(shortcuts)

@@ -2,13 +2,13 @@
 
 package cmd
 
-import t "github.com/mmmcclimon/toggl-go/internal/toggl"
+import "github.com/mmmcclimon/toggl-go/internal/toggl"
 
 const JIRA_ENABLED = true
 
 // used by cmd/start
-func startJiraTask(toggl *t.Toggl, taskId string) error {
-	c := toggl.Config.NewJiraClient()
+func startJiraTask(tc *toggl.Client, taskId string) error {
+	c := tc.Config.NewJiraClient()
 	issue := c.GetIssue(taskId)
-	return startTask(toggl, issue.PrettyDescription(), issue.TogglProjectId, "")
+	return startTask(tc, issue.PrettyDescription(), issue.TogglProjectId, "")
 }

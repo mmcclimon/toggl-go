@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	t "github.com/mmmcclimon/toggl-go/internal/toggl"
+	"github.com/mmmcclimon/toggl-go/internal/toggl"
 	"github.com/spf13/cobra"
 )
 
@@ -17,11 +17,11 @@ func (cmd ResumeCommand) Cobra() *cobra.Command {
 	}
 }
 
-func (cmd ResumeCommand) Run(toggl *t.Toggl, args []string) error {
+func (cmd ResumeCommand) Run(tc *toggl.Client, args []string) error {
 	start := time.Now().Add(-6 * time.Hour)
 	end := time.Now()
 
-	entries, err := toggl.TimeEntries(start, end)
+	entries, err := tc.TimeEntries(start, end)
 	if err != nil {
 		return err
 	}
@@ -33,7 +33,7 @@ func (cmd ResumeCommand) Run(toggl *t.Toggl, args []string) error {
 
 	last := entries[0]
 
-	timer, err := toggl.ResumeTimer(last)
+	timer, err := tc.ResumeTimer(last)
 	if err != nil {
 		return err
 	}

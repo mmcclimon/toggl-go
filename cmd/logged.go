@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"time"
 
-	t "github.com/mmmcclimon/toggl-go/internal/toggl"
+	"github.com/mmmcclimon/toggl-go/internal/toggl"
 	"github.com/spf13/cobra"
 )
 
@@ -27,7 +27,7 @@ func (cmd LoggedCommand) Cobra() *cobra.Command {
 	return cc
 }
 
-func (cmd LoggedCommand) Run(toggl *t.Toggl, args []string) error {
+func (cmd LoggedCommand) Run(tc *toggl.Client, args []string) error {
 	if len(args) != 1 {
 		fmt.Println("need exactly one description to search for")
 		os.Exit(1)
@@ -42,13 +42,13 @@ func (cmd LoggedCommand) Run(toggl *t.Toggl, args []string) error {
 	end := time.Now()
 	start := end.Add(-1 * time.Duration(cmd.days) * 24 * time.Hour)
 
-	entries, err := toggl.TimeEntries(start, end)
+	entries, err := tc.TimeEntries(start, end)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
-	matching := make([]*t.Timer, 0, len(entries))
+	matching := make([]*toggl.Timer, 0, len(entries))
 
 	for _, entry := range entries {
 		if re.MatchString(entry.OnelineDesc()) {
@@ -61,6 +61,6 @@ func (cmd LoggedCommand) Run(toggl *t.Toggl, args []string) error {
 		return nil
 	}
 
-	t.PrintEntryList(matching)
+	toggl.PrintEntryList(matching)
 	return nil
 }
