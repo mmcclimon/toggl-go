@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 	"regexp"
 	"time"
 
@@ -29,14 +28,12 @@ func (cmd LoggedCommand) Cobra() *cobra.Command {
 
 func (cmd LoggedCommand) Run(tc *toggl.Client, args []string) error {
 	if len(args) != 1 {
-		fmt.Println("need exactly one description to search for")
-		os.Exit(1)
+		return fmt.Errorf("need exactly one description to search for")
 	}
 
 	re, err := regexp.Compile("(?i)" + args[0])
 	if err != nil {
-		fmt.Println("could not compile description regex:", err)
-		os.Exit(1)
+		return fmt.Errorf("could not compile description regex: %w", err)
 	}
 
 	end := time.Now()
@@ -44,8 +41,7 @@ func (cmd LoggedCommand) Run(tc *toggl.Client, args []string) error {
 
 	entries, err := tc.TimeEntries(start, end)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		return err
 	}
 
 	matching := make([]*toggl.Timer, 0, len(entries))
