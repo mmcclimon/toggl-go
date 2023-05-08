@@ -26,7 +26,7 @@ type timerData struct {
 	Description string
 	Duration    int64
 	Start       time.Time
-	End         time.Time
+	Stop        time.Time
 	ProjectId   int `json:"project_id"`
 	WorkspaceId int `json:"workspace_id"`
 	Tags        []string
@@ -45,7 +45,7 @@ func (c *Client) timerFromData(data timerData) *Timer {
 		WorkspaceId: data.WorkspaceId,
 		Project:     project,
 		Start:       data.Start,
-		End:         data.End,
+		End:         data.Stop,
 		duration:    data.Duration,
 		projectId:   data.ProjectId,
 	}
