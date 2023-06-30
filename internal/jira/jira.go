@@ -67,10 +67,15 @@ func (c *Client) issueFromRaw(issue *jira.Issue) Issue {
 
 	if fromProject, ok := c.cfg.Projects[epic]; ok {
 		projectId = fromProject
-	} else if fields.Type.Name == bfTaskName {
-		projectId = c.cfg.Projects["BF_DEFAULT"]
 	} else {
-		projectId = c.cfg.Projects["DEFAULT"]
+		switch {
+		case fields.Type.Name == bfTaskName:
+			projectId = c.cfg.Projects["BF_DEFAULT"]
+		case fields.Project.Key == "HELP":
+			projectId = c.cfg.Projects["HELP_DEFAULT"]
+		default:
+			projectId = c.cfg.Projects["DEFAULT"]
+		}
 	}
 
 	return Issue{
