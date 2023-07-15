@@ -7,8 +7,13 @@ import "github.com/mmmcclimon/toggl-go/internal/toggl"
 const JIRA_ENABLED = true
 
 // used by cmd/start
-func startJiraTask(tc *toggl.Client, taskId string) error {
+func startJiraTask(tc *toggl.Client, taskId string, projectId int) error {
 	c := tc.Config.NewJiraClient()
 	issue := c.GetIssue(taskId)
-	return startTask(tc, issue.PrettyDescription(), issue.TogglProjectId, "")
+
+	if projectId == 0 {
+		projectId = issue.TogglProjectId
+	}
+
+	return startTask(tc, issue.PrettyDescription(), projectId, "")
 }

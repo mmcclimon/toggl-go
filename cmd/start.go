@@ -36,6 +36,11 @@ func (cmd *StartCommand) Run(tc *toggl.Client, args []string) error {
 		return errors.New("need a description")
 	}
 
+	projectId := 0
+	if len(cmd.project) > 0 {
+		projectId = tc.Config.ProjectShortcuts[cmd.project]
+	}
+
 	likelyId := regexp.MustCompile(`(?i)^[a-z]{3,}-[0-9]+$`)
 
 	if JIRA_ENABLED && (cmd.id != "" || likelyId.MatchString(desc)) {
@@ -44,12 +49,7 @@ func (cmd *StartCommand) Run(tc *toggl.Client, args []string) error {
 			id = desc
 		}
 
-		return startJiraTask(tc, id)
-	}
-
-	projectId := 0
-	if len(cmd.project) > 0 {
-		projectId = tc.Config.ProjectShortcuts[cmd.project]
+		return startJiraTask(tc, id, projectId)
 	}
 
 	// is this a shortcut
