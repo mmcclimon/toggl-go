@@ -38,8 +38,9 @@ func setup() *cobra.Command {
 	rootCmd := &cobra.Command{
 		Use:               "toggl",
 		CompletionOptions: cobra.CompletionOptions{DisableDefaultCmd: true},
-		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
-			return maybeLoadConfig(cmd, &toggl)
+		PersistentPreRunE: func(cmd *cobra.Command, _ []string) (err error) {
+			toggl, err = maybeLoadConfig(cmd)
+			return err
 		},
 	}
 
@@ -59,14 +60,15 @@ func setup() *cobra.Command {
 }
 
 // If cmd is a child command (i.e., not the root), load up the config.
-func maybeLoadConfig(cmd *cobra.Command, client **toggl.Client) error {
+func maybeLoadConfig(cmd *cobra.Command) (*toggl.Client, error) {
 	if !cmd.HasParent() {
-		return nil
+		return nil, nil
 	}
 
 	// read config, etc.
-	*client = toggl.NewClient()
-	return (*client).ReadConfig()
+	client := toggl.NewClient()
+	err := client.ReadConfig()
+	return client, err
 }
 
 // This is so goofy: time.Truncate() acts on absolute (roughly, Unix) time,
