@@ -26,6 +26,7 @@ var allCommands = []TogglCommand{
 	&ShortcutsCommand{},
 	&StartCommand{},
 	&StopCommand{},
+	&TimelineCommand{},
 	&TimerCommand{},
 	&TodayCommand{},
 	&WeekCommand{},

@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"slices"
 	"time"
 
 	"github.com/mmmcclimon/toggl-go/internal/toggl"
@@ -37,35 +36,6 @@ func (cmd *TodayCommand) Run(tc *toggl.Client, args []string) error {
 		return nil
 	}
 
-	if cmd.log {
-		return cmd.printLog(entries)
-	}
-
 	toggl.PrintEntryList(entries)
-	return nil
-}
-
-func (cmd *TodayCommand) printLog(entries []*toggl.Timer) error {
-	slices.Reverse(entries)
-
-	var total time.Duration
-
-	for _, t := range entries {
-		end := t.End.Local().Format("15:04")
-		if t.End.IsZero() {
-			end = ""
-		}
-
-		fmt.Printf("%s–%5s  %s\n",
-			t.Start.Local().Format("15:04"),
-			end,
-			t.OnelineDesc(),
-		)
-
-		total += t.Duration()
-	}
-
-	fmt.Println("-----------")
-	fmt.Printf("%0.2fh total (%s)\n", total.Hours(), total)
 	return nil
 }
