@@ -91,7 +91,8 @@ func (c *Client) issueFromRaw(issue *jira.Issue) Issue {
 func (iss *Issue) PrettyDescription() string {
 	lcKey := strings.ToLower(iss.Key)
 
-	if iss.Kind == bfTaskName {
+	if iss.Kind == bfTaskName ||
+		strings.HasPrefix(iss.Key, "HELP-") {
 		return lcKey
 	}
 
