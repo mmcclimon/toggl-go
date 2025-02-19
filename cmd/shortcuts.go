@@ -2,11 +2,11 @@ package cmd
 
 import (
 	"fmt"
-	"sort"
+	"maps"
+	"slices"
 
 	"github.com/mmmcclimon/toggl-go/internal/toggl"
 	"github.com/spf13/cobra"
-	"golang.org/x/exp/maps"
 )
 
 type ShortcutsCommand struct{}
@@ -21,8 +21,7 @@ func (cmd *ShortcutsCommand) Cobra() *cobra.Command {
 func (cmd *ShortcutsCommand) Run(tc *toggl.Client, args []string) error {
 	shortcuts := tc.Config.TaskShortcuts
 
-	titles := maps.Keys(shortcuts)
-	sort.Strings(titles)
+	titles := slices.Sorted(maps.Keys(shortcuts))
 
 	length := 0
 	for _, title := range titles {

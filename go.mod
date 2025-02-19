@@ -1,6 +1,6 @@
 module github.com/mmmcclimon/toggl-go
 
-go 1.22
+go 1.24
 
 require (
 	github.com/BurntSushi/toml v1.2.1
@@ -8,7 +8,6 @@ require (
 	github.com/davecgh/go-spew v1.1.1
 	github.com/dghubble/oauth1 v0.7.2
 	github.com/spf13/cobra v1.6.1
-	golang.org/x/exp v0.0.0-20230224173230-c95f2b4c22f2
 )
 
 require (

@@ -5,13 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"maps"
 	"net/http"
 	"net/url"
 	"os"
-	"sort"
+	"slices"
 	"time"
-
-	"golang.org/x/exp/maps"
 )
 
 type Client struct {
@@ -208,12 +207,9 @@ func PrintEntryList(entries []*Timer) {
 		grouped[k] = append(grouped[k], t)
 	}
 
-	keys := maps.Keys(grouped)
-	sort.Strings(keys)
-
 	var total time.Duration
 
-	for _, k := range keys {
+	for _, k := range slices.Sorted(maps.Keys(grouped)) {
 		entries := grouped[k]
 
 		var taskTotal time.Duration
